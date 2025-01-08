@@ -2,26 +2,16 @@ from scraper import Scraper
 import re
 from helpers import format_class, add_query_params
 
-# constants
-# classes
+# mandatory classes
 classes_url = "https://uwaterloo.ca/academic-calendar/undergraduate-studies/catalog#/programs/rJj6aXDk6?searchTerm=bachelor%20of%20math&bc=true&bcCurrent=Bachelor%20of%20Mathematics%20Degree%20Requirements&bcItemType=programs"
-xpath_classes_list_1 = '//*[@id="__KUALI_TLP"]/div/div[2]/div[4]/span/div/div/div/div/div/div/section[2]/div/div[2]/section[1]/div/div/div/ul/li/div/div/ul'
-xpath_classes_list_2 = '//*[@id="__KUALI_TLP"]/div/div[2]/div[4]/span/div/div/div/div/div/div/section[2]/div/div[2]/section[2]/div/div/div/ul/li/ul/li[2]/div/div/ul'
 
 # class info
 class_info_url = "https://classes.uwaterloo.ca/cgi-bin/cgiwrap/infocour/salook.pl?level=under&sess=1251"
 
-# indexes from class_info
-indexes = [3 , 6, 7]
-
 # get required classes from uwaterloo.ca
 scraper = Scraper(classes_url)
-
-classes = scraper.get_element_info(xpath_classes_list_2).split("\n")
-classes.extend(scraper.get_element_info(xpath_classes_list_2).split("\n"))
+classes = scraper.get_classes(use_cache=True)
 scraper.quit()
-
-classes = [format_class(c) for c in classes]
 
 list_of_classes = []
 
@@ -35,7 +25,7 @@ for c in classes:
 
         for col in columns:
             if col[0].isdigit(): # col is good to check
-                if col[4] != "ONLINE": 
+                if col[4] != "ONLINE":
                     list_of_info.append({ "class": " ".join(c), "online": "no"})
                 list_of_info.append({ "class": " ".join(c), "online": "yes" ,"available": col[6]>col[7] })
             else:
@@ -49,7 +39,6 @@ for c in classes:
                     break
         else: 
             list_of_classes.extend(list_of_info)
-        
 
     except Exception as e:
         scraper.quit()

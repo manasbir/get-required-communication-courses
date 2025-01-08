@@ -3,6 +3,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from helpers import format_class
+# constants
+# classes
+xpath_classes_list_1 = '//*[@id="__KUALI_TLP"]/div/div[2]/div[4]/span/div/div/div/div/div/div/section[2]/div/div[2]/section[1]/div/div/div/ul/li/div/div/ul'
+xpath_classes_list_2 = '//*[@id="__KUALI_TLP"]/div/div[2]/div[4]/span/div/div/div/div/div/div/section[2]/div/div[2]/section[2]/div/div/div/ul/li/ul/li[2]/div/div/ul'
 
 class_info_xpath = '/html/body/main/p[2]/table/tbody/tr[3]/td[2]/table/tbody'
 class_info_alt_xpath = '/html/body/main/p[2]/table/tbody/tr[3]/td[2]/table/tbody/tr[3]/td[2]/table/tbody'
@@ -31,6 +36,20 @@ class Scraper:
         except Exception as e:
             element = self.driver.find_element(By.XPATH, class_info_xpath)
             return element.text
+        
+    def get_classes(self, use_cache=True):
+        if use_cache:
+            with open("classes.txt", "r") as f:
+                classes = f.readlines()
+        else:
+            classes = self.get_element_info(xpath_classes_list_2).split("\n")
+            classes.extend(self.get_element_info(xpath_classes_list_2).split("\n"))
+
+            with open("classes.txt", "w") as f:
+                f.write("\n".join(classes))
+            
+            
+        return [format_class(c) for c in classes]
         
 
     def quit(self):

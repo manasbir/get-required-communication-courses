@@ -23,10 +23,11 @@ scraper.quit()
 
 classes = [format_class(c) for c in classes]
 
-list_of_info = []
+list_of_classes = []
 
 for c in classes:
     try:
+        list_of_info = []
         scraper = Scraper(add_query_params(class_info_url, c))
         scraper.quit()
         lines = scraper.get_class_info().split("\n")[1:]
@@ -34,10 +35,21 @@ for c in classes:
 
         for col in columns:
             if col[0].isdigit(): # col is good to check
-                if col[4] != "ONLINE": continue
-                list_of_info.append({ "class": " ".join(c), "available": "online, yes, is at capacity?" + col[6]>col[7] })
+                if col[4] != "ONLINE": 
+                    list_of_info.append({ "class": " ".join(c), "online": "no"})
+                list_of_info.append({ "class": " ".join(c), "online": "yes" ,"available": col[6]>col[7] })
             else:
                 continue
+        if len(list_of_info) == 0:
+            list_of_classes.append({ "class": " ".join(c), "available": "err/not offered this semester" })
+        elif len(list_of_info) > 1:
+            for list in list_of_info:
+                if list["online"] == "yes":
+                    list_of_classes.append(list)
+                    break
+        else: 
+            list_of_classes.extend(list_of_info)
+        
 
     except Exception as e:
         scraper.quit()

@@ -26,7 +26,6 @@ classes = [format_class(c) for c in classes]
 list_of_info = []
 
 for c in classes:
-    print(c)
     try:
         scraper = Scraper(add_query_params(class_info_url, c))
         scraper.quit()
